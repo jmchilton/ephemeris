@@ -22,10 +22,10 @@ function start_container {
     echo "Wait for galaxy to start"
     galaxy-wait -g http://localhost:$WEB_PORT -v --timeout 120
     echo "Done waiting..."
-    WEB_PORT=$(docker logs $CID)
+    docker logs $CID
     echo "Logs complete..."
     sleep 300
-    WEB_PORT=$(docker logs $CID)
+    docker logs $CID
     echo "Logs complete..."
 }
 

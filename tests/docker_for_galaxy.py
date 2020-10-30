@@ -12,7 +12,7 @@ from ephemeris.sleep import galaxy_wait
 GALAXY_IMAGE = "bgruening/galaxy-stable:20.05"
 GALAXY_ADMIN_KEY = "fakekey"
 GALAXY_ADMIN_PASSWORD = "password"
-GALAXY_ADMIN_USER = "admin"
+GALAXY_ADMIN_USER = "admin@galaxy.org"
 
 client = docker.from_env()
 

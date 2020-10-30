@@ -18,7 +18,7 @@ function start_container {
     WEB_PORT=$(docker inspect --format="{{(index (index .NetworkSettings.Ports \"$INTERNAL_EXPOSED_WEB_PORT/tcp\") 0).HostPort}}" $CID)
     GALAXY_ADMIN_KEY="fakekey"
     GALAXY_ADMIN_PASSWORD="password"
-    GALAXY_ADMIN_USER="admin"
+    GALAXY_ADMIN_USER="admin@galaxy.org"
     echo "Wait for galaxy to start"
     galaxy-wait -g http://localhost:$WEB_PORT -v --timeout 120
 }

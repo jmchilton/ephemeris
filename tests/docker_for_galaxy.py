@@ -10,6 +10,9 @@ from ephemeris.sleep import galaxy_wait
 # It needs to work well with dev. Alternatively we can pin this to 'master' or another stable branch.
 # Preferably a branch that updates with each stable release
 GALAXY_IMAGE = "bgruening/galaxy-stable:latest"
+GALAXY_ADMIN_KEY = "fakekey"
+GALAXY_ADMIN_PASSWORD = "password"
+GALAXY_ADMIN_USER = "admin"
 
 client = docker.from_env()
 
@@ -44,5 +47,5 @@ def start_container(**kwargs):
     yield GalaxyContainer(url=container_url,
                           container=container,
                           attributes=container_attributes,
-                          gi=GalaxyInstance(container_url, key="admin"))
+                          gi=GalaxyInstance(container_url, key=GALAXY_ADMIN_KEY))
     container.remove(force=True)

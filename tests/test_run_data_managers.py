@@ -7,7 +7,7 @@ import time
 
 import pytest
 import yaml
-from docker_for_galaxy import start_container  # noqa: F401 prevent unused error
+from docker_for_galaxy import GALAXY_ADMIN_PASSWORD, GALAXY_ADMIN_USER, start_container  # noqa: F401 prevent unused error
 
 from ephemeris import run_data_managers
 from ephemeris.run_data_managers import DataManagers
@@ -40,8 +40,8 @@ class TestRunDataManagers(object):
         """Tests an installation using the command line"""
         container = start_container
         sys.argv = ["run-data-managers",
-                    "--user", "admin@galaxy.org",
-                    "-p", "admin",
+                    "--user", GALAXY_ADMIN_USER,
+                    "-p", GALAXY_ADMIN_PASSWORD,
                     "-g", container.url,
                     "--config", "tests/run_data_managers.yaml.test"]
         run_data_managers.main()

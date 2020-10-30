@@ -1,4 +1,5 @@
 from collections import namedtuple
+from time import sleep
 
 import docker
 import pytest
@@ -46,6 +47,7 @@ def start_container(**kwargs):
                 timeout=60)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
     print("FOO!!!!!!!!!!\n\n\n\n\n\n\n\n\n\n")
     print(container.logs())
+    sleep(300)
     yield GalaxyContainer(url=container_url,
                           container=container,
                           attributes=container_attributes,

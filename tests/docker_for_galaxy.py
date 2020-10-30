@@ -9,7 +9,7 @@ from ephemeris.sleep import galaxy_wait
 
 # It needs to work well with dev. Alternatively we can pin this to 'master' or another stable branch.
 # Preferably a branch that updates with each stable release
-GALAXY_IMAGE = "bgruening/galaxy-stable:latest"
+GALAXY_IMAGE = "bgruening/galaxy-stable:20.05"
 GALAXY_ADMIN_KEY = "fakekey"
 GALAXY_ADMIN_PASSWORD = "password"
 GALAXY_ADMIN_USER = "admin"

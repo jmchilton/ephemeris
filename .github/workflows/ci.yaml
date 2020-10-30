@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.5']
+        python-version: ['3.6']
         tox-action:
           - pytest
           - integration

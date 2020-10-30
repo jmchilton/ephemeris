@@ -2,6 +2,7 @@
 
 set -eu
 set -o pipefail
+set -o xtrace
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -14,6 +15,8 @@ echo "Check tool installation with yaml on the commandline"
 # CD Hit was chosen since it is old and seems to be unmaintained. Last update was 2015.
 # Anyone know a smaller tool that could fit its place?
 OLD_TOOL="{'owner':'jjohnson','name':'cdhit','revisions':['34a799d173f7'],'tool_panel_section_label':'CD_HIT'}"
+echo "$GALAXY_ADMIN_USER"
+echo "$GALAXY_ADMIN_PASSWORD"
 shed-tools install -y  ${OLD_TOOL} --user "$GALAXY_ADMIN_USER" -p "$GALAXY_ADMIN_PASSWORD" -g http://localhost:$WEB_PORT
 get-tool-list -g http://localhost:$WEB_PORT -o result_tool_list.yaml
 grep "cdhit" result_tool_list.yaml

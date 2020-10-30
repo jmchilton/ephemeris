@@ -21,6 +21,8 @@ function start_container {
     GALAXY_ADMIN_USER="admin@galaxy.org"
     echo "Wait for galaxy to start"
     galaxy-wait -g http://localhost:$WEB_PORT -v --timeout 120
+    echo "Done waiting..."
+    WEB_PORT=$(docker logs $CID)
 }
 
 function start_new_container {

@@ -50,13 +50,17 @@ class SleepCondition(object):
         self.sleep = False
 
 
-def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None):
+def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None, assert_admin=False):
     """Pass user_key to ensure it works before returning."""
     version_url = galaxy_url + "/api/version"
     if api_key:
         # adding the key to the URL will ensure Galaxy returns invalid responses until
         # the key is available.
-        version_url = "%s?%s" % (version_url, api_key)
+        version_url = "%s?key=%s" % (version_url, api_key)
+        get_user_url = "%s/api/users/current?key=%s" % (galaxy_url, api_key)
+    else:
+        assert not assert_admin
+
     if sleep_condition is None:
         sleep_condition = SleepCondition()
 

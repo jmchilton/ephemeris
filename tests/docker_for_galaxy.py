@@ -2,7 +2,6 @@ from collections import namedtuple
 
 import docker
 import pytest
-from bioblend import ConnectionError
 from bioblend.galaxy import GalaxyInstance
 
 from ephemeris.sleep import galaxy_wait
@@ -30,7 +29,7 @@ def start_container(**kwargs):
     # and use the internal ip address instead.
     # But alas, the trappings of a proprietary BSD kernel compel us to do ugly workarounds.
     key = kwargs.get("api_key", GALAXY_ADMIN_KEY)
-    assert_admin = kwargs.get("assert_admin", True)
+    ensure_admin = kwargs.get("ensure_admin", True)
 
     container = client.containers.run(GALAXY_IMAGE, detach=True, ports={'80/tcp': None}, **kwargs)
     container_id = container.attrs.get('Id')
@@ -48,25 +47,9 @@ def start_container(**kwargs):
     assert key
     galaxy_wait(container_url,
                 timeout=120,
-                api_key=key)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
-    print("KEY IS %s" % key)
+                api_key=key,
+                ensure_admin=ensure_admin)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
     gi = GalaxyInstance(container_url, key=key)
-    if assert_admin:
-        current_user = None
-        for i in range(20):
-            try:
-                current_user = gi.users.get_current_user()
-            except ConnectionError:
-                if i < 19:
-                    import time
-                    time.sleep(5)
-                    continue
-                else:
-                    raise
-        is_admin = current_user.get('is_admin', False)
-        if not is_admin:
-            print("BIG PROBLEM, NOT ADMIN!!!")
-            raise AssertionError("is_admin [%s]" % is_admin)
     yield GalaxyContainer(url=container_url,
                           container=container,
                           attributes=container_attributes,

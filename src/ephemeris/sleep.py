@@ -30,6 +30,9 @@ def _parser():
     parser.add_argument("-a", "--api_key",
                         dest="api_key",
                         help="Sleep until key becomes available.")
+    parser.add_argument("--ensure_admin",
+                        default=False,
+                        action="store_true")
     return parser
 
 
@@ -50,39 +53,60 @@ class SleepCondition(object):
         self.sleep = False
 
 
-def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None, assert_admin=False):
+def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None, ensure_admin=False):
     """Pass user_key to ensure it works before returning."""
     version_url = galaxy_url + "/api/version"
     if api_key:
         # adding the key to the URL will ensure Galaxy returns invalid responses until
         # the key is available.
         version_url = "%s?key=%s" % (version_url, api_key)
-        get_user_url = "%s/api/users/current?key=%s" % (galaxy_url, api_key)
+        current_user_url = "%s/api/users/current?key=%s" % (galaxy_url, api_key)
     else:
-        assert not assert_admin
+        assert not ensure_admin
 
     if sleep_condition is None:
         sleep_condition = SleepCondition()
 
     count = 0
+    version_obtained = False
+
     while sleep_condition.sleep:
         try:
-            result = requests.get(version_url)
-            if result.status_code == 403:
-                if verbose:
-                    sys.stdout.write("[%02d] Provided key not (yet) valid... %s\n" % (count, result.__str__()))
-                    sys.stdout.flush()
-            else:
-                try:
-                    result = result.json()
+            if not version_obtained:
+                result = requests.get(version_url)
+                if result.status_code == 403:
                     if verbose:
-                        sys.stdout.write("Galaxy Version: %s\n" % result['version_major'])
+                        sys.stdout.write("[%02d] Provided key not (yet) valid... %s\n" % (count, result.__str__()))
                         sys.stdout.flush()
+                else:
+                    try:
+                        result = result.json()
+                        if verbose:
+                            sys.stdout.write("Galaxy Version: %s\n" % result['version_major'])
+                            sys.stdout.flush()
+                        version_obtained = True
+                    except ValueError:
+                        if verbose:
+                            sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
+                            sys.stdout.flush()
+            if version_obtained and ensure_admin:
+                result = requests.get(current_user_url)
+                if result.status_code != 200:
+                    if verbose:
+                        sys.stdout.write("[%02d] Connection error fetching user details, exiting with error code... %s\n" % (count, result.__str__()))
+                        sys.stdout.flush()
+                        return False
+
+                result = result.json()
+                is_admin = result['is_admin']
+                if is_admin:
                     break
-                except ValueError:
+                else:
                     if verbose:
-                        sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
+                        sys.stdout.write("[%02d] Provided key not (yet) valid... %s\n" % (count, result.__str__()))
                         sys.stdout.flush()
+            else:
+                break
         except requests.exceptions.ConnectionError as e:
             if verbose:
                 sys.stdout.write("[%02d] Galaxy not up yet... %s\n" % (count, unicodify(e)[:100]))
@@ -111,6 +135,7 @@ def main():
         verbose=options.verbose,
         timeout=options.timeout,
         api_key=options.api_key,
+        ensure_admin=options.ensure_admin,
     )
     exit_code = 0 if galaxy_alive else 1
     sys.exit(exit_code)

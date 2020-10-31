@@ -44,6 +44,7 @@ def start_container(**kwargs):
     exposed_port = container_attributes.get('NetworkSettings').get('Ports').get('80/tcp')[0].get('HostPort')
 
     container_url = "http://localhost:{0}".format(exposed_port)
+    assert key
     galaxy_wait(container_url,
                 timeout=60,
                 api_key=key)  # We are only going to wait 60 seconds. These are tests, and we are impatient!

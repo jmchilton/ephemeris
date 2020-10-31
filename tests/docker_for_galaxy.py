@@ -29,6 +29,8 @@ def start_container(**kwargs):
     # The random port is because we need mac compatibility. On GNU/linux a better option would be not to expose it
     # and use the internal ip address instead.
     # But alas, the trappings of a proprietary BSD kernel compel us to do ugly workarounds.
+    key = kwargs.get("api_key", GALAXY_ADMIN_KEY)
+    assert_admin = kwargs.get("assert_admin", True)
 
     container = client.containers.run(GALAXY_IMAGE, detach=True, ports={'80/tcp': None}, **kwargs)
     container_id = container.attrs.get('Id')
@@ -45,9 +47,13 @@ def start_container(**kwargs):
     container_url = "http://localhost:{0}".format(exposed_port)
     galaxy_wait(container_url,
                 timeout=60,
-                api_key=GALAXY_ADMIN_KEY)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
+                api_key=key)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
+    gi = GalaxyInstance(container_url, key=key)
+    if assert_admin:
+        current_user = gi.users.get_current_user()
+        assert current_user['is_admin'], current_user
     yield GalaxyContainer(url=container_url,
                           container=container,
                           attributes=container_attributes,
-                          gi=GalaxyInstance(container_url, key=GALAXY_ADMIN_KEY))
+                          gi=gi)
     container.remove(force=True)

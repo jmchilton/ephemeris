@@ -101,6 +101,7 @@ def main():
     """
     options = _parse_cli_options()
 
+    print(">>>> api_key %s" % options.api_key)
     galaxy_alive = galaxy_wait(
         galaxy_url=options.galaxy,
         verbose=options.verbose,

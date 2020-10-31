@@ -51,7 +51,10 @@ def start_container(**kwargs):
     gi = GalaxyInstance(container_url, key=key)
     if assert_admin:
         current_user = gi.users.get_current_user()
-        assert current_user['is_admin'], current_user
+        is_admin = current_user.get('is_admin', False)
+        if not is_admin:
+            print("BIG PROBLEM, NOT ADMIN!!!")
+            raise AssertionError("is_admin [%s]" % is_admin)
     yield GalaxyContainer(url=container_url,
                           container=container,
                           attributes=container_attributes,

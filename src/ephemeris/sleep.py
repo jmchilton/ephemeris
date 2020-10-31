@@ -50,7 +50,7 @@ class SleepCondition(object):
         self.sleep = False
 
 
-def sleep(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None):
+def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None):
     """Pass user_key to ensure it works before returning."""
     version_url = galaxy_url + "/api/version"
     if api_key:
@@ -96,7 +96,7 @@ def main():
     """
     options = _parse_cli_options()
 
-    galaxy_alive = sleep(
+    galaxy_alive = galaxy_wait(
         galaxy_url=options.galaxy,
         verbose=options.verbose,
         timeout=options.timeout,

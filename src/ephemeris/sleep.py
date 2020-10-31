@@ -27,6 +27,9 @@ def _parser():
     parser.add_argument("--timeout",
                         default=0, type=int,
                         help="Galaxy startup timeout in seconds. The default value of 0 waits forever")
+    parser.add_argument("-a", "--api_key",
+                        dest="api_key",
+                        help="Sleep until key becomes available.")
     return parser
 
 
@@ -47,14 +50,20 @@ class SleepCondition(object):
         self.sleep = False
 
 
-def sleep(galaxy_url, verbose=False, timeout=0, sleep_condition=None):
+def sleep(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None):
+    """Pass user_key to ensure it works before returning."""
+    version_url = galaxy_url + "/api/version"
+    if api_key:
+        # adding the key to the URL will ensure Galaxy returns invalid responses until
+        # the key is available.
+        version_url = "%s?%s" % (version_url, api_key)
     if sleep_condition is None:
         sleep_condition = SleepCondition()
 
     count = 0
     while sleep_condition.sleep:
         try:
-            result = requests.get(galaxy_url + '/api/version')
+            result = requests.get(version_url)
             try:
                 result = result.json()
                 if verbose:
@@ -87,7 +96,12 @@ def main():
     """
     options = _parse_cli_options()
 
-    galaxy_alive = sleep(galaxy_url=options.galaxy, verbose=options.verbose, timeout=options.timeout)
+    galaxy_alive = sleep(
+        galaxy_url=options.galaxy,
+        verbose=options.verbose,
+        timeout=options.timeout,
+        api_key=options.api_key,
+    )
     exit_code = 0 if galaxy_alive else 1
     sys.exit(exit_code)
 

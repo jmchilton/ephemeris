@@ -44,10 +44,8 @@ def start_container(**kwargs):
 
     container_url = "http://localhost:{0}".format(exposed_port)
     galaxy_wait(container_url,
-                timeout=60)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
-    print("FOO!!!!!!!!!!\n\n\n\n\n\n\n\n\n\n")
-    print(container.logs())
-    sleep(300)
+                timeout=60,
+                api_key=GALAXY_ADMIN_KEY)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
     yield GalaxyContainer(url=container_url,
                           container=container,
                           attributes=container_attributes,

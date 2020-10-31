@@ -1,5 +1,4 @@
 from collections import namedtuple
-from time import sleep
 
 import docker
 import pytest

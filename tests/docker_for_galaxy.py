@@ -2,6 +2,7 @@ from collections import namedtuple
 
 import docker
 import pytest
+from bioblend import ConnectionError
 from bioblend.galaxy import GalaxyInstance
 
 from ephemeris.sleep import galaxy_wait
@@ -46,11 +47,22 @@ def start_container(**kwargs):
     container_url = "http://localhost:{0}".format(exposed_port)
     assert key
     galaxy_wait(container_url,
-                timeout=60,
+                timeout=120,
                 api_key=key)  # We are only going to wait 60 seconds. These are tests, and we are impatient!
+    print("KEY IS %s" % key)
     gi = GalaxyInstance(container_url, key=key)
     if assert_admin:
-        current_user = gi.users.get_current_user()
+        current_user = None
+        for i in range(20):
+            try:
+                current_user = gi.users.get_current_user()
+            except ConnectionError:
+                if i < 19:
+                    import time
+                    time.sleep(5)
+                    continue
+                else:
+                    raise
         is_admin = current_user.get('is_admin', False)
         if not is_admin:
             print("BIG PROBLEM, NOT ADMIN!!!")

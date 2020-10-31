@@ -64,16 +64,21 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
     while sleep_condition.sleep:
         try:
             result = requests.get(version_url)
-            try:
-                result = result.json()
+            if result.status_code == 403:
                 if verbose:
-                    sys.stdout.write("Galaxy Version: %s\n" % result['version_major'])
+                    sys.stdout.write("[%02d] Provided key not (yet) valid... %s\n" % (count, result.__str__()))
                     sys.stdout.flush()
-                break
-            except ValueError:
-                if verbose:
-                    sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
-                    sys.stdout.flush()
+            else:
+                try:
+                    result = result.json()
+                    if verbose:
+                        sys.stdout.write("Galaxy Version: %s\n" % result['version_major'])
+                        sys.stdout.flush()
+                    break
+                except ValueError:
+                    if verbose:
+                        sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
+                        sys.stdout.flush()
         except requests.exceptions.ConnectionError as e:
             if verbose:
                 sys.stdout.write("[%02d] Galaxy not up yet... %s\n" % (count, unicodify(e)[:100]))

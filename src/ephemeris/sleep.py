@@ -102,6 +102,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                 is_admin = result['is_admin']
                 if is_admin:
                     sys.stdout.write("HAVE AN ADMIN KEY!!!!!!!!\n\n\n\n\n")
+                    sys.stdout.flush()
                     break
                 else:
                     if verbose:
@@ -122,7 +123,11 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
 
         time.sleep(DEFAULT_SLEEP_WAIT)
 
+    sys.stdout.write("about to do extra random sleep\n\n\n\n\n")
+    sys.stdout.flush()
     time.sleep(120)
+    sys.stdout.write("Returning from wait!!!!!!!!\n\n\n\n\n")
+    sys.stdout.flush()
     return True
 
 

@@ -101,6 +101,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                 result = result.json()
                 is_admin = result['is_admin']
                 if is_admin:
+                    sys.stdout.write("HAVE AN ADMIN KEY!!!!!!!!\n\n\n\n\n")
                     break
                 else:
                     if verbose:

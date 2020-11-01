@@ -103,7 +103,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                     break
                 else:
                     if verbose:
-                        sys.stdout.write("[%02d] Provided key not (yet) valid... %s\n" % (count, result.__str__()))
+                        sys.stdout.write("[%02d] Provided key not (yet) admin... %s\n" % (count, result.__str__()))
                         sys.stdout.flush()
             else:
                 break

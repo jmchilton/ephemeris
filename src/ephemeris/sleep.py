@@ -121,6 +121,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
 
         time.sleep(DEFAULT_SLEEP_WAIT)
 
+    time.sleep(120)
     return True
 
 

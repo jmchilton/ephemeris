@@ -17,6 +17,12 @@ from galaxy.util import unicodify
 from .common_parser import get_common_args
 
 DEFAULT_SLEEP_WAIT = 1
+MESSAGE_KEY_NOT_YET_VALID = "[%02d] Provided key not (yet) valid... %s\n"
+MESSAGE_INVALID_JSON = "[%02d] No valid json returned... %s\n"
+MESSAGE_FETCHING_USER = "[%02d] Connection error fetching user details, exiting with error code. %s\n"
+MESSAGE_KEY_NOT_YET_ADMIN = "[%02d] Provided key not (yet) admin... %s\n"
+MESSAGE_GALAXY_NOT_YET_UP = "[%02d] Galaxy not up yet... %s\n"
+MESSAGE_TIMEOUT = "Failed to contact Galaxy within timeout (%s), exiting with error code.\n"
 
 
 def _parser():
@@ -82,7 +88,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                 result = requests.get(version_url)
                 if result.status_code == 403:
                     if verbose:
-                        sys.stdout.write("[%02d] Provided key not (yet) valid... %s\n" % (count, result.__str__()))
+                        sys.stdout.write(MESSAGE_KEY_NOT_YET_VALID % (count, result.__str__()))
                         sys.stdout.flush()
                 else:
                     try:
@@ -93,7 +99,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                         version_obtained = True
                     except ValueError:
                         if verbose:
-                            sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
+                            sys.stdout.write(MESSAGE_INVALID_JSON % (count, result.__str__()))
                             sys.stdout.flush()
 
             if version_obtained:
@@ -104,7 +110,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                     result = requests.get(current_user_url)
                     if result.status_code != 200:
                         if verbose:
-                            sys.stdout.write("[%02d] Connection error fetching user details, exiting with error code... %s\n" % (count, result.__str__()))
+                            sys.stdout.write(MESSAGE_FETCHING_USER % (count, result.__str__()))
                             sys.stdout.flush()
                             return False
 
@@ -116,19 +122,19 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                         break
                     else:
                         if verbose:
-                            sys.stdout.write("[%02d] Provided key not (yet) admin... %s\n" % (count, result.__str__()))
+                            sys.stdout.write(MESSAGE_KEY_NOT_YET_ADMIN % (count, result.__str__()))
                             sys.stdout.flush()
                 else:
                     break
         except requests.exceptions.ConnectionError as e:
             if verbose:
-                sys.stdout.write("[%02d] Galaxy not up yet... %s\n" % (count, unicodify(e)[:100]))
+                sys.stdout.write(MESSAGE_GALAXY_NOT_YET_UP % (count, unicodify(e)[:100]))
                 sys.stdout.flush()
         count += 1
 
         # If we cannot talk to galaxy and are over the timeout
         if timeout != 0 and count > timeout:
-            sys.stderr.write("Failed to contact Galaxy\n")
+            sys.stderr.write(MESSAGE_TIMEOUT % timeout)
             return False
 
         time.sleep(DEFAULT_SLEEP_WAIT)

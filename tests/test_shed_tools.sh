@@ -39,6 +39,7 @@ start_new_container
 echo "Check tool installation with --latest"
 shed-tools install -y  $OLD_TOOL --user "$GALAXY_ADMIN_USER" -p "$GALAXY_ADMIN_KEY" -g "${GALAXY_URL}" --latest
 get-tool-list -g "${GALAXY_URL}" -o result_tool_list.yaml
+cat result_tool_list.yaml
 grep "cdhit" result_tool_list.yaml
 grep "28b7a43907f0" result_tool_list.yaml #latest revision
 

@@ -96,33 +96,30 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                             sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
                             sys.stdout.flush()
 
-            check_current_user = version_obtained and ensure_admin
-            sys.stdout.write("check current user %s" % check_current_user)
-            sys.stdout.flush()
-
-            if check_current_user:
-                sys.stdout.write("fetching current user from %s\n\n\n" % current_user_url)
-                sys.stdout.flush()
-
-                result = requests.get(current_user_url)
-                if result.status_code != 200:
-                    if verbose:
-                        sys.stdout.write("[%02d] Connection error fetching user details, exiting with error code... %s\n" % (count, result.__str__()))
-                        sys.stdout.flush()
-                        return False
-
-                result = result.json()
-                is_admin = result['is_admin']
-                if is_admin:
-                    sys.stdout.write("HAVE AN ADMIN KEY!!!!!!!!\n\n\n\n\n")
+            if version_obtained:
+                if ensure_admin:
+                    sys.stdout.write("fetching current user from %s\n\n\n" % current_user_url)
                     sys.stdout.flush()
-                    break
-                else:
-                    if verbose:
-                        sys.stdout.write("[%02d] Provided key not (yet) admin... %s\n" % (count, result.__str__()))
+
+                    result = requests.get(current_user_url)
+                    if result.status_code != 200:
+                        if verbose:
+                            sys.stdout.write("[%02d] Connection error fetching user details, exiting with error code... %s\n" % (count, result.__str__()))
+                            sys.stdout.flush()
+                            return False
+
+                    result = result.json()
+                    is_admin = result['is_admin']
+                    if is_admin:
+                        sys.stdout.write("HAVE AN ADMIN KEY!!!!!!!!\n\n\n\n\n")
                         sys.stdout.flush()
-            else:
-                break
+                        break
+                    else:
+                        if verbose:
+                            sys.stdout.write("[%02d] Provided key not (yet) admin... %s\n" % (count, result.__str__()))
+                            sys.stdout.flush()
+                else:
+                    break
         except requests.exceptions.ConnectionError as e:
             if verbose:
                 sys.stdout.write("[%02d] Galaxy not up yet... %s\n" % (count, unicodify(e)[:100]))
@@ -138,7 +135,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
 
     sys.stdout.write("about to do extra random sleep\n\n\n\n\n")
     sys.stdout.flush()
-    time.sleep(120)
+    time.sleep(30)
     sys.stdout.write("Returning from wait!!!!!!!!\n\n\n\n\n")
     sys.stdout.flush()
     return True

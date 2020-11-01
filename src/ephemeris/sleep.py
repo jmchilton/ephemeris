@@ -73,7 +73,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
     while sleep_condition.sleep:
         try:
             if not version_obtained:
-                sys.stdout("fetching version from %s\n\n\n" % version_url)
+                sys.stdout.write("fetching version from %s\n\n\n" % version_url)
                 result = requests.get(version_url)
                 if result.status_code == 403:
                     if verbose:

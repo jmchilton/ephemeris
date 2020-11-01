@@ -55,6 +55,10 @@ class SleepCondition(object):
 
 def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_key=None, ensure_admin=False):
     """Pass user_key to ensure it works before returning."""
+    if verbose:
+        sys.stdout.write("calling galaxy_wait with timeout=%s ensure_admin=%s\n\n\n" % (timeout, ensure_admin))
+        sys.stdout.flush()
+
     version_url = galaxy_url + "/api/version"
     if api_key:
         # adding the key to the URL will ensure Galaxy returns invalid responses until
@@ -74,6 +78,7 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
         try:
             if not version_obtained:
                 sys.stdout.write("fetching version from %s\n\n\n" % version_url)
+                sys.stdout.flush()
                 result = requests.get(version_url)
                 if result.status_code == 403:
                     if verbose:
@@ -91,6 +96,9 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                             sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
                             sys.stdout.flush()
             if version_obtained and ensure_admin:
+                sys.stdout.write("fetching current user from %s\n\n\n" % current_user_url)
+                sys.stdout.flush()
+
                 result = requests.get(current_user_url)
                 if result.status_code != 200:
                     if verbose:

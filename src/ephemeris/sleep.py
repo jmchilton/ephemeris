@@ -95,7 +95,12 @@ def galaxy_wait(galaxy_url, verbose=False, timeout=0, sleep_condition=None, api_
                         if verbose:
                             sys.stdout.write("[%02d] No valid json returned... %s\n" % (count, result.__str__()))
                             sys.stdout.flush()
-            if version_obtained and ensure_admin:
+
+            check_current_user = version_obtained and ensure_admin
+            sys.stdout.write("check current user %s" % check_current_user)
+            sys.stdout.flush()
+
+            if check_current_user:
                 sys.stdout.write("fetching current user from %s\n\n\n" % current_user_url)
                 sys.stdout.flush()
 

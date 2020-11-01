@@ -22,6 +22,7 @@ function start_container {
     GALAXY_URL="http://localhost:$WEB_PORT"
     echo "Wait for galaxy to start"
     galaxy-wait -g "${GALAXY_URL}" -a "${GALAXY_ADMIN_KEY}" --ensure_admin -v --timeout 180
+    echo "Return from galaxy-wait $?"
 }
 
 function start_new_container {
